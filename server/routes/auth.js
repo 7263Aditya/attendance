@@ -65,6 +65,7 @@ router.post('/additional-details', auth, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    // Check if the user is not a student
     if (user.role !== 'student') {
       return res.status(403).json({ message: 'Only students are allowed to submit additional details' });
     }
@@ -75,7 +76,18 @@ router.post('/additional-details', auth, async (req, res) => {
     }
 
     // Update the user document with additional details
-    user.courseName = courseName;
-    user.year = year;
-    user.additionalDetailsSubmitted = true;
-    await u
+    await User.updateOne(
+      { _id: userId },
+      { $set: { courseName, year, additionalDetailsSubmitted: true } }
+    );
+
+    res.status(200).json({ message: 'Additional details submitted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+
+module.exports = router;
